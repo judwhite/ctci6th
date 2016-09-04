@@ -1,7 +1,9 @@
 package pairs
 
 import (
+	"math/rand"
 	"testing"
+	"time"
 )
 
 // Given an array of distinct integer values, count the number of pairs of integers that have difference k.
@@ -15,7 +17,7 @@ func TestBruteForce(t *testing.T) {
 
 	actual := bruteForce(input, k)
 
-	validate(t, expected, actual)
+	validate(t, "bruteForce", expected, actual)
 }
 
 func TestSortFirst(t *testing.T) {
@@ -25,7 +27,7 @@ func TestSortFirst(t *testing.T) {
 
 	actual := sortFirst(input, k)
 
-	validate(t, expected, actual)
+	validate(t, "sortFirst", expected, actual)
 }
 
 func TestHashMap(t *testing.T) {
@@ -35,7 +37,7 @@ func TestHashMap(t *testing.T) {
 
 	actual := hashMap(input, k)
 
-	validate(t, expected, actual)
+	validate(t, "hashMap", expected, actual)
 }
 
 func TestSparseSet(t *testing.T) {
@@ -45,22 +47,29 @@ func TestSparseSet(t *testing.T) {
 
 	actual := sparseSet(input, k)
 
-	validate(t, expected, actual)
+	validate(t, "sparseSet", expected, actual)
+}
+
+type testCase struct {
+	name string
+	f    func([]int, int) [][]int
 }
 
 func TestAllAgainstBruteForce(t *testing.T) {
-	var input []int
-	for i := int(1e4); i >= 0; i -= 3 {
-		input = append(input, i)
-	}
+	input := getRandomInput()
 	k := 6
 
 	expected := bruteForce(input, k)
 
-	funcs := []func([]int, int) [][]int{bruteForce, sortFirst, hashMap, sparseSet}
-	for _, f := range funcs {
-		actual := f(input, 6)
-		validate(t, expected, actual)
+	cases := []testCase{
+		{"bruteForce", bruteForce},
+		{"sortFirst", sortFirst},
+		{"hashMap", hashMap},
+		{"sparseSet", sparseSet},
+	}
+	for _, c := range cases {
+		actual := c.f(input, k)
+		validate(t, c.name, expected, actual)
 	}
 }
 
@@ -116,9 +125,70 @@ func BenchmarkSparseSet(b *testing.B) {
 	}
 }
 
-func validate(t testing.TB, expected, actual [][]int) {
+var randomInput []int
+
+func getRandomInput() []int {
+	if len(randomInput) == 0 {
+		rand.Seed(time.Now().UnixNano())
+		set := make(map[int]bool)
+		const size = 1e5
+		for i := 0; i < size; i++ {
+			n := rand.Intn(size * 3)
+			for set[n] {
+				n = rand.Intn(size * 3)
+			}
+			set[n] = true
+			randomInput = append(randomInput, n)
+		}
+	}
+
+	return randomInput
+}
+
+func BenchmarkBruteForceRandom(b *testing.B) {
+	input := getRandomInput()
+	k := 6
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		bruteForce(input, k)
+	}
+}
+
+func BenchmarkSortFirstRandom(b *testing.B) {
+	input := getRandomInput()
+	k := 6
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		sortFirst(input, k)
+	}
+}
+
+func BenchmarkHashMapRandom(b *testing.B) {
+	input := getRandomInput()
+	k := 6
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		hashMap(input, k)
+	}
+}
+
+func BenchmarkSparseSetRandom(b *testing.B) {
+	input := getRandomInput()
+	k := 6
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		sparseSet(input, k)
+	}
+}
+
+func validate(t testing.TB, name string, expected, actual [][]int) {
 	if len(expected) != len(actual) {
-		t.Errorf("want: %v got: %v", expected, actual)
+		t.Errorf("func: %s\n\t\t  want: %v\n\t\t  got:  %v\n\t\t  len(want) = %d len(got) = %d",
+			name, expected, actual, len(expected), len(actual))
 		return
 	}
 
