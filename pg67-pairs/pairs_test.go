@@ -62,7 +62,6 @@ func TestAllAgainstBruteForce(t *testing.T) {
 	expected := bruteForce(input, k)
 
 	cases := []testCase{
-		{"bruteForce", bruteForce},
 		{"sortFirst", sortFirst},
 		{"hashMap", hashMap},
 		{"sparseSet", sparseSet},
