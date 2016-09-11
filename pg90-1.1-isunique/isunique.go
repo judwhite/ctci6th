@@ -52,7 +52,7 @@ func isUniqueMap(s string) bool {
 // This solution I didn't initially think of. I checked the solutions on pg192 and saw "bit vector" and went back
 // to the code to implement it. It'll only work with ASCII characters which usually isn't a valid assumption, but
 // solving the general problem of uniqueness in an array given a a bounded range of values is interesting.
-// Update: The benchmark is about 1/2 the speed of the isUniqueArray function, probably due to the additional
+// Update: The benchmark is about twice as slow as the isUniqueArray function, probably due to the additional
 // math. The memory usage is 4 bytes so this technique certainly has application. The solution in the book assumed
 // lowercase a-z to use a single int, which would reduce the math.
 func isUniqueBitVector(s string) bool {
@@ -69,7 +69,7 @@ func isUniqueBitVector(s string) bool {
 	return true
 }
 
-// isUniqueBitVector returns true if all characters in a string are unique, using a bit vector
+// isUniqueBitVector2 returns true if all characters in a string are unique, using a bit vector
 // it's limited to lowercase a-z. in a cruel twist of fate, the 256-byte array version is still faster and
 // covers more of the ASCII set, though this uses less memory.
 func isUniqueBitVector2(s string) bool {
