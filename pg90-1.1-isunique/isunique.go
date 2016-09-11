@@ -71,7 +71,7 @@ func isUniqueBitVector(s string) bool {
 
 // isUniqueBitVector2 returns true if all characters in a string are unique, using a bit vector
 // it's limited to lowercase a-z. in a cruel twist of fate, the 256-byte array version is still faster and
-// covers more of the ASCII set, though this uses less memory.
+// covers more of the ASCII set, though this uses less memory. always run your benchmarks.
 func isUniqueBitVector2(s string) bool {
 	var m uint
 	for i := 0; i < len(s); i++ {
