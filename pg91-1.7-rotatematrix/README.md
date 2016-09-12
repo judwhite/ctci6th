@@ -29,6 +29,8 @@ C D E F      F B 7 3
   - We'll start at col=row and work until N-1-row
   - We only need to do N/2 rows
 
+Walking through it manually helped. [The code](https://github.com/judwhite/ctci6th/blob/master/pg91-1.7-rotatematrix/rotatematrix.go) is easier to comprehend.
+
 ```
 BenchmarkRotate/0x0-8         	500000000	         3.64 ns/op	       0 B/op	       0 allocs/op
 BenchmarkRotate/1x1-8         	500000000	         3.76 ns/op	       0 B/op	       0 allocs/op
