@@ -27,20 +27,20 @@ func urlifyInPlace(s string, length int) string {
 	// NOTE: walking backwards is probably a really bad idea if we're dealing with unicode,
 	// if we hit 0x20 there's no guarantee it's not part of another character. see urlifyInPlace2
 	// for a slower but safer version which walks from the start.
-	r := []byte(s)
+	b := []byte(s)
 	srcEnd := length
-	dstStart := len(r)
+	dstStart := len(b)
 	for i := length - 1; i >= 0; i-- {
-		if r[i] != ' ' {
+		if b[i] != ' ' {
 			continue
 		}
 		dstStart -= (srcEnd - (i + 1))    // subtract the length of the src block from dest start
-		copy(r[dstStart:], r[i+1:srcEnd]) // copy src chunk into dst
-		copy(r[dstStart-3:], "%20")       // add '%20' before chunk
+		copy(b[dstStart:], b[i+1:srcEnd]) // copy src chunk into dst
+		copy(b[dstStart-3:], "%20")       // add '%20' before chunk
 		dstStart -= 3                     // subtract the length of '%20' from dest start
 		srcEnd = i                        // new src end
 	}
-	return string(r)
+	return string(b)
 }
 
 // urlifyReplace replaces ' ' with '%20' using the standard library strings.Replace.
@@ -52,26 +52,25 @@ func urlifyReplace(s string, length int) string {
 
 // urlifyAllocNew replaces ' ' with '%20'.
 func urlifyAllocNew(s string, length int) string {
-	s1 := []byte(s)
 	s2 := make([]byte, len(s))
 	var srcStart, dstStart int
 
 	var i int
 	for i = 0; i < length; {
-		r, size := utf8.DecodeRune(s1[i:])
+		r, size := utf8.DecodeRuneInString(s[i:])
 		i += size
 
 		if r != ' ' {
 			continue
 		}
 
-		dstStart += copy(s2[dstStart:], s1[srcStart:i-1])
+		dstStart += copy(s2[dstStart:], s[srcStart:i-1])
 		dstStart += copy(s2[dstStart:], "%20")
 		srcStart = i
 	}
 
 	if srcStart != i {
-		dstStart += copy(s2[dstStart:], s1[srcStart:i])
+		dstStart += copy(s2[dstStart:], s[srcStart:i])
 	}
 
 	return string(s2)
@@ -97,4 +96,42 @@ func urlifyInPlace2(s string, length int) string {
 	}
 
 	return string(s1)
+}
+
+func urlifyInPlaceBytes(s []byte, length int) []byte {
+	// NOTE: walking backwards is probably a really bad idea if we're dealing with unicode,
+	// if we hit 0x20 there's no guarantee it's not part of another character. see urlifyInPlace2
+	// for a slower but safer version which walks from the start.
+	srcEnd := length
+	dstStart := len(s)
+	for i := length - 1; i >= 0; i-- {
+		if s[i] != ' ' {
+			continue
+		}
+		dstStart -= (srcEnd - (i + 1))    // subtract the length of the src block from dest start
+		copy(s[dstStart:], s[i+1:srcEnd]) // copy src chunk into dst
+		copy(s[dstStart-3:], "%20")       // add '%20' before chunk
+		dstStart -= 3                     // subtract the length of '%20' from dest start
+		srcEnd = i                        // new src end
+	}
+	return s
+}
+
+func urlifyInPlaceBytes2(s []byte, length int) []byte {
+	var i int
+	for i = 0; i < len(s); {
+		r, size := utf8.DecodeRune(s[i:])
+		i += size
+
+		if r != ' ' {
+			continue
+		}
+
+		copy(s[i+2:], s[i:])
+		copy(s[i-1:], "%20")
+
+		i += 2
+	}
+
+	return s
 }
