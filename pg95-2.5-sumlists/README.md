@@ -13,14 +13,12 @@
 
 The implementations I came up with and the book are different. The book implementation handles the math and carry digit on a per-node basis, whereas my implementation sums the two linked-lists and builds a linked-list from the result. Performance differences are mostly negligible, though the book implementation of the left-to-right ordered digits has extra allocations in cases where it needs to left pad with "0" nodes. The book uses recursion where I used an iterative approach, and the book contains more lines of code.
 
-|--------------------|------|------------------|
 |                    | SLOC | ∑ Benchmark Time |
-|--------------------|------|------------------|
+|--------------------|-----:|-----------------:|
 | Sum                |   28 |          5890 ns |
 | Sum (book)         |   47 |          5982 ns |
 | Reverse Sum        |   23 |          4882 ns |
 | Reverse Sum (book) |   34 |          5273 ns |
-|--------------------|------|------------------|
 
 ```
 BenchmarkSum/0+0=0-8                       30000000      41 ns/op     16 B/op    1 allocs/op
